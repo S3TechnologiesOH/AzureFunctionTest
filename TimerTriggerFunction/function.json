@@ -5,6 +5,7 @@
         "name": "mytimer",
         "type": "timerTrigger",
         "direction": "in",
+        "authLevel": "anonymous",
         "schedule": "0 0 0 * * *"
       }
     ]
