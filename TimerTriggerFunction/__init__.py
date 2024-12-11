@@ -1,13 +1,21 @@
-import mysql.connector # type: ignore
+import mysql.connector  # type: ignore
 import logging
 
-# Database configuration
-db_config = {
-    'host': 'your-database-host',
-    'user': 'your-database-user',
-    'password': 'your-database-password',
-    'database': 'your-database-name'
-}
+# Connection string
+connection_string = "mysql://your-database-user:your-database-password@your-database-host/your-database-name"
+
+def parse_connection_string(conn_string):
+    from urllib.parse import urlparse
+    parsed = urlparse(conn_string)
+    return {
+        'user': parsed.username,
+        'password': parsed.password,
+        'host': parsed.hostname,
+        'port': parsed.port or 3306,  # Default MySQL port
+        'database': parsed.path.lstrip('/')
+    }
+
+db_config = parse_connection_string(connection_string)
 
 def update_opportunity_and_check(id, opportunity_stage_id):
     try:
