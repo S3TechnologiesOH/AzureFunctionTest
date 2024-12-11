@@ -6,17 +6,35 @@ from urllib.parse import urlparse
 # Connection string
 connection_string = "mysql://your-database-user:your-database-password@your-database-host/your-database-name"
 
-def parse_connection_string(conn_string):
-    parsed = urlparse(conn_string)
+def parse_connection_string(connection_string):
+    config = {}
+    parts = connection_string.split(';')
+
+    for part in parts:
+        if '=' in part:  # Ensure it's a valid key-value pair
+            key, value = part.split('=', 1)  # Limit split to 1 in case value contains '='
+            if key and value:  # Check that both key and value exist
+                config[key.strip().lower()] = value.strip()
+
+    # Construct the database configuration
+    data_source = config.get('data source', '')
+    host, port = (data_source.split(':') + [3306])[:2]  # Split and default port if not specified
+    port = int(port) if str(port).isdigit() else 3306
+
     return {
-        'user': parsed.username,
-        'password': parsed.password,
-        'host': parsed.hostname,
-        'port': parsed.port or 3306,  # Default MySQL port
-        'database': parsed.path.lstrip('/')
+        'host': host,
+        'port': port,
+        'user': config.get('user id'),
+        'password': config.get('password'),
+        'database': config.get('database'),
     }
 
+# Example usage
+connection_string = "Data Source=localhost:3306;User ID=my_user;Password=my_password;Database=my_database;"
 db_config = parse_connection_string(connection_string)
+
+print(db_config)
+
 
 def update_opportunity_and_check(id, opportunity_stage_id):
     try:
@@ -118,5 +136,5 @@ def fetch_and_process_deals(api_key, sort_by_field='amount', per_page=100):
         raise
 
 # Example usage:
-# api_key = "your-api-key-here"
-# fetch_and_process_deals(api_key)
+api_key = "rwYHYDXtbYkuXRImQKoDVA"
+fetch_and_process_deals(api_key)
